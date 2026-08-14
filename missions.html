@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Mission</title>
+  <style>
+    body { background-color: #0b0d12; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
+    h1 { font-size: 2.2rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 30px; color: #a3e635; text-transform: uppercase; }
+    .grid-container { display: grid; grid-template-columns: repeat(2, 280px); grid-template-rows: repeat(4, 90px); gap: 20px; }
+    .mission-btn { background: rgba(18, 21, 28, 0.9); border: 2px solid #a3e635; color: white; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .mission-btn:hover { background: #a3e635; color: #0b0d12; transform: scale(1.03); }
+    .btn-back { position: absolute; top: 30px; left: 30px; padding: 10px 22px; font-weight: 700; background: #1e293b; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <button class="btn-back" onclick="window.location.href='mode.html'">&#8592; MODE</button>
+  <h1>CHOOSE MISSION</h1>
+  
+  <div class="grid-container">
+    <button class="mission-btn" onclick="startMission(1)">1. Normal Race</button>
+    <button class="mission-btn" onclick="startMission(2)">2. Reverse Map Lap</button>
+    <button class="mission-btn" onclick="startMission(3)">3. Elimination (30s)</button>
+    <button class="mission-btn" onclick="startMission(4)">4. Time Attack (Sprint)</button>
+    <button class="mission-btn" onclick="startMission(5)">5. Speed Trap Rush</button>
+    <button class="mission-btn" onclick="startMission(6)">6. Heavy Traffic Circuit</button>
+    <button class="mission-btn" onclick="startMission(7)">7. Night Neon Circuit</button>
+    <button class="mission-btn" onclick="startMission(8)">8. Ultimate Grand Finale</button>
+  </div>
+
+  <script>
+    function startMission(missionNum) {
+      const config = JSON.parse(localStorage.getItem('raceConfig') || '{}');
+      config.mission = missionNum;
+      localStorage.setItem('raceConfig', JSON.stringify(config));
+      window.location.href = 'map1.html';
+    }
+  </script>
+</body>
+</html>

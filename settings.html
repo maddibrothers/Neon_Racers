@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Settings</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0d0d11;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 42px;
+            color: #ffaa00;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px rgba(255, 170, 0, 0.4);
+        }
+
+        .settings-card {
+            background: #1a1a24;
+            border: 2px solid #333;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #87CEEB;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+        .opt-btn {
+            background: #252533;
+            border: 2px solid #444;
+            color: #fff;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .opt-btn:hover {
+            border-color: #87CEEB;
+        }
+
+        .opt-btn.active {
+            border-color: #00ffaa;
+            background: #142a22;
+            color: #00ffaa;
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.2s;
+        }
+
+        #save-btn {
+            background: linear-gradient(90deg, #00ffaa, #00cc88);
+            color: #000;
+        }
+
+        #back-btn {
+            background: #333;
+            color: #fff;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>⚙️ Settings</h1>
+
+    <div class="settings-card">
+        <!-- Resolution Settings -->
+        <div class="setting-group">
+            <div class="setting-label">Graphics Resolution</div>
+            <div class="options-grid grid-3" id="res-options">
+                <div class="opt-btn" data-res="480p">480p</div>
+                <div class="opt-btn" data-res="720p">720p</div>
+                <div class="opt-btn" data-res="1080p">1080p</div>
+            </div>
+        </div>
+
+        <!-- Dynamic Shadow Settings -->
+        <div class="setting-group">
+            <div class="setting-label">30m Nearby Shadows</div>
+            <div class="options-grid grid-2" id="shadow-options">
+                <div class="opt-btn" data-shadow="true">ON ☀️</div>
+                <div class="opt-btn" data-shadow="false">OFF ⚡</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button id="back-btn" class="action-btn">Back</button>
+            <button id="save-btn" class="action-btn">Save</button>
+        </div>
+    </div>
+
+    <script>
+        // Load existing settings
+        const settingsRaw = localStorage.getItem('gameSettings');
+        let currentSettings = settingsRaw ? JSON.parse(settingsRaw) : { resolution: '1080p', shadows: true };
+
+        // Resolution Option Buttons
+        const resBtns = document.querySelectorAll('#res-options .opt-btn');
+        resBtns.forEach(btn => {
+            if (btn.getAttribute('data-res') === currentSettings.resolution) {
+                btn.classList.add('active');
+            }
+            btn.addEventListener('click', () => {
+                resBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSettings.resolution = btn.getAttribute('data-res');
+            });
+        });
+
+        // Shadow Option Buttons
+        const shadowBtns = document.querySelectorAll('#shadow-options .opt-btn');
+        shadowBtns.forEach(btn => {
+            const isValTrue = btn.getAttribute('data-shadow') === 'true';
+            if (isValTrue === currentSettings.shadows) {
+                btn.classList.add('active');
+            }
+            btn.addEventListener('click', () => {
+                shadowBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSettings.shadows = (btn.getAttribute('data-shadow') === 'true');
+            });
+        });
+
+        document.getElementById('save-btn').addEventListener('click', () => {
+            localStorage.setItem('gameSettings', JSON.stringify(currentSettings));
+            window.location.href = 'map1.html';
+        });
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            window.location.href = 'map1.html';
+        });
+    </script>
+</body>
+</html>

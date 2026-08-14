@@ -1,0 +1,154 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+(function initSpector() {
+    // 1. Inject required CSS dynamically into the document
+    const style = document.createElement('style');
+    style.textContent = `
+        #spector-hud {
+            position: absolute;
+            top: 75px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #00ffaa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, monospace, sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #555;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+            user-select: none;
+            min-width: 210px;
+        }
+        #spector-title {
+            font-size: 11px;
+            color: #ffaa00;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #spector-coords {
+            font-size: 13px;
+            color: #ffffff;
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #spector-btn {
+            background: #00ffaa;
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        #spector-btn:hover {
+            background: #87CEEB;
+        }
+        #spector-btn:active {
+            transform: scale(0.95);
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Create the HUD UI Elements
+    const hud = document.createElement('div');
+    hud.id = 'spector-hud';
+    hud.innerHTML = `
+        <div id="spector-title">🎥 Inspector Mode</div>
+        <div id="spector-coords">X: 0.00 | Y: 0.00 | Z: 0.00</div>
+        <button id="spector-btn">🌐 Free View</button>
+    `;
+    document.body.appendChild(hud);
+
+    const coordsEl = document.getElementById('spector-coords');
+    const toggleBtn = document.getElementById('spector-btn');
+
+    let controls = null;
+    let isFreeView = false;
+
+    // 3. Wait until map1.html finishes setting up game references
+    function checkGameReady() {
+        if (window.gameRef && window.gameRef.camera && window.gameRef.renderer) {
+            setupControls();
+        } else {
+            requestAnimationFrame(checkGameReady);
+        }
+    }
+
+    function setupControls() {
+        const { camera, renderer, getTargetCar, setCameraMode, getCameraMode } = window.gameRef;
+
+        // Initialize Touch & Mouse Orbit Controls
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enabled = false;
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        toggleBtn.addEventListener('click', () => {
+            isFreeView = !isFreeView;
+            
+            if (isFreeView) {
+                setCameraMode('FREE_VIEW');
+                const targetCar = getTargetCar();
+                if (targetCar && targetCar.mesh) {
+                    controls.target.copy(targetCar.mesh.position);
+                }
+                controls.enabled = true;
+                toggleBtn.innerText = '🏎️ 3rd Person';
+                toggleBtn.style.background = '#ffaa00';
+            } else {
+                setCameraMode('3RD_PERSON');
+                controls.enabled = false;
+                toggleBtn.innerText = '🌐 Free View';
+                toggleBtn.style.background = '#00ffaa';
+            }
+        });
+
+        // Loop to continuously update coordinates display
+        function updateLoop() {
+            requestAnimationFrame(updateLoop);
+
+            // Display realtime camera coordinates
+            if (camera) {
+                const x = camera.position.x.toFixed(2);
+                const y = camera.position.y.toFixed(2);
+                const z = camera.position.z.toFixed(2);
+                coordsEl.innerText = `X: ${x} | Y: ${y} | Z: ${z}`;
+            }
+
+            // Sync UI if player used the top-bar camera button
+            const currentMode = getCameraMode();
+            if (isFreeView && currentMode !== 'FREE_VIEW') {
+                isFreeView = false;
+                controls.enabled = false;
+                toggleBtn.innerText = '🌐 Free View';
+                toggleBtn.style.background = '#00ffaa';
+            }
+
+            // Update OrbitControls when in Free View
+            if (isFreeView && controls && controls.enabled) {
+                controls.update();
+            }
+        }
+
+        updateLoop();
+    }
+
+    checkGameReady();
+})();
